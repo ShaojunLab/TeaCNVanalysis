@@ -1,4 +1,4 @@
-setwd('/Users/yanru/Library/Mobile Documents/com~apple~CloudDocs/TeaCNVmanuscript/Code_Rdata_upload/')
+setwd('~/Library/Mobile Documents/com~apple~CloudDocs/TeaCNVmanuscript/Code_Rdata_upload/')
 
 library(Seurat)
 library(ggplot2)
