@@ -96,12 +96,12 @@ for(ID in c("ccRCC2","ccRCC3","ccRCC4")){
 	 
 	new_obj<- AddMetaData(new_obj,cellinfo)
 
-	#Fig.S4a,c
+	#Fig.
 	pd <- DimPlot(new_obj, reduction = "umap", group.by = "clone",pt.size =1.2,label.size = 5,label = F,repel = T,cols=color_r)+ ggtitle("CNV")#&NoLegend()
 	pd+p_atac+p_rna
 	ggsave(paste0(outdir_clt,"/umap_Epi_clone.pdf"),pd+p_atac+p_rna,height=4.5,width =13.5)
 
-	#fig.3d
+	#fig.
 	markers <- c("EPCAM","KRT19","KRT18","KRT8")
 	DefaultAssay(obj_sub) <- "SCT"
 	existing_genes <- markers[markers %in% rownames(obj_sub)]
@@ -171,7 +171,7 @@ colnames(tb_nCount) <-CNV_segs$Region
 new_obj<- AddMetaData(new_obj,tb_nCount)
 # saveRDS(new_obj,paste0(outdir_clt,"/SeuratObj_CNVumap.rds"))
 
-##Fig.2c, Fig.3d
+##Fig.
 pp <- FeaturePlot(object = new_obj, features = CNV_segs$Region,ncol=4,pt.size =1.2,
    min.cutoff = "q5", max.cutoff = "q95")& scale_colour_gradientn(colours = c("#F1F2F2","yellow","red")) 
 plot.list <- lapply(pp, function(x) x  +
