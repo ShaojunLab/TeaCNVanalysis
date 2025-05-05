@@ -14,7 +14,7 @@ method <- c("epiAneu","copyscAT","TeaCNV")
 sampleID <- c("ccRCC1","ccRCC3","ccRCC4")
 
 
-###Figure 2g,2j
+###Figure 4e,h
 ###deviation and dispersion
 library(sfsmisc)
 deviation <- c()
@@ -501,7 +501,7 @@ TeaCNV.dis <- mean(c(TeaCNV.dis1,TeaCNV.dis2,TeaCNV.dis3,TeaCNV.dis4))
 deviation <- rbind(deviation,data.frame(sample=ID,method=c(method,"inferCNV"),RMSE=c(epiAneu,copyscAT,TeaCNV,inferCNV)))
 dispersion <- rbind(dispersion,data.frame(sample=ID,method=c(method,"inferCNV"),Dispersion=c(epiAneu.dis,copyscAT.dis,TeaCNV.dis,inferCNV.dis)))
 
-##Fig 3f: RMSE
+##Fig 4h: RMSE
 my_comparisons <- list(c("copyscAT", "TeaCNV"), c("epiAneu", "TeaCNV"))
 deviation$metrics = 'RMSE'
 P3 = ggplot(deviation[deviation$method!="inferCNV",], aes(x=method, y=RMSE)) + 
@@ -796,9 +796,9 @@ barplot(dispersion,ylab = "Dispersion",ylim=c(0,1))
 CN.dispersion[[3]] <- dispersion
 names(CN.dispersion)[3] <- ID
 
-saveRDS(CN.dispersion,file = paste0('./Figure2g.CNV_dirpersion.RDS'))
+saveRDS(CN.dispersion,file = paste0('./Figure.CNV_dirpersion.RDS'))
 
-###Fig 2g: dispersion
+###Fig 4e: dispersion
 pdf(file = paste0('./WGS.CNV.dispersion.pdf'),width=6.5,height = 2.5)
 par(mfrow=c(1,3))
 barplot(CN.dispersion[[3]],ylab = "Dispersion",ylim=c(0,1),main = 'ccRCC1',las=2,
@@ -814,6 +814,6 @@ tb <- do.call(rbind,CN.dispersion[1:2])
 
 tb <- rbind(tb,c(NA,CN.dispersion[[3]]))
 rownames(tb)[3] <- names(CN.dispersion)[3]
-write.csv(tb,paste0('./Figure2j.CNV_dirpersion.table.csv'),row.names=FALSE)
+write.csv(tb,paste0('./Figure.CNV_dirpersion.table.csv'),row.names=FALSE)
 colMeans(tb,na.rm=TRUE)
 

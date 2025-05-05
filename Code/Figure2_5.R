@@ -16,8 +16,8 @@ source('./Code/Function/atac_visualizeFun.R')
 #plotdir <- '~/Library/Mobile Documents/com~apple~CloudDocs/code/code_CNV/TeaCNVAnalysis'
 plotdir <- './'
 # setwd(plotdir)
-color_celltype <- c(Endothelial="#CCFFCC",Epithelial="#C5A48A",Immne="#CCCCCC",Stromal="#CC99FF")
-cols_Palette = c("#CCCCCC","#A6DAEF","#D9BDD8","#E58579","#8AB1D2","#F9E9A4","#F1AEA7","#9D9ECD","#C9C780"),
+color_celltype <- c(Endothelial="#CCFFCC",Epithelial="#C5A48A",Immune="#CCCCCC",Stromal="#CC99FF")
+cols_Palette = c("#CCCCCC","#A6DAEF","#D9BDD8","#E58579","#8AB1D2","#F9E9A4","#F1AEA7","#9D9ECD","#C9C780")
 
 cnv_plots_comb <- function(ID,outres,
 	cols_Palette = c("#CCCCCC","#A6DAEF","#D9BDD8","#E58579","#8AB1D2","#F9E9A4","#F1AEA7","#9D9ECD","#C9C780"),
@@ -154,18 +154,19 @@ custom_theme <-
 ID = "ccRCC1"
 rdsFile <- "./Rdata/Kidney_scATAC_2Sample.rds"
 obj <- readRDS(rdsFile)
+#Fig.2b
 color_list <- list(sampleName=c("#FFCC00","#009999"),
                    CellType = color_celltype)
 group_by <- c("sampleName","CellType") 
 pd <- DimPlot.multi(obj,group_by = group_by,color_list=color_list,legend_position = "right")
 ggsave(paste0(plotdir,"/DimPlot_",group_by[1],".pdf"),pd,width =10,height = 5)
 
-
+#Fig.2c
 CNVresFile_sc <- paste0("./AnalysisData/final.CNVres_",ID,".rds")
 outres <- readRDS(CNVresFile_sc)
 cnv_plots_comb(ID,outres,plotdir=plotdir)
 
-##Extended Data Fig. 4
+##Supplementary Fig. 4
 CNVresFile_sc <- paste0("./AnalysisData/final.CNVres_",ID,"_immune.rds")
 outres2 <- readRDS(CNVresFile_sc)
 cnv_plots_comb(ID,outres2,plotdir=plotdir)
@@ -174,12 +175,33 @@ CNVresFile_sc <- paste0("./AnalysisData/final.CNVres_",ID,"_Endo.rds")
 outres3 <- readRDS(CNVresFile_sc)
 cnv_plots_comb(ID,outres3,plotdir=plotdir)
 
+##Supplementary Fig. 3
+DefaultAssay(obj) <- "peaks"
+Idents(obj)<- "CellType"
+library(Signac)
+library(ggplot2)
+Coverageplt <- list()
+for(gene in markers){
+	#(1) Plotting aggregated signal
+	cov_plot <- CoveragePlot(
+	  object = obj,
+	  region = gene,
+	  annotation = TRUE,
+	  peaks = F,
+	  links = F
+	)+scale_fill_manual(values=color_celltype)
+	
+	ggsave(paste0(plotdir,"/",ID,"_Coverageplt_",gene,".pdf"),cov_plot,width =5,height = 5)
+
+}
+
 
 
 ##ccRCC2
 ID = "ccRCC2"
 CNVresFile_sc <- paste0("./AnalysisData/final.CNVres_",ID,".rds")
 outres <- readRDS(CNVresFile_sc)
+#Fig.2d,e
 cnv_plots_comb(ID,outres,plotdir=plotdir)
 
 ##Extended Data Fig. 5
@@ -194,6 +216,42 @@ cnv_plots_comb(ID,outres3,plotdir=plotdir)
 
 ##.ccRCC3
 ID = "ccRCC3"
+rdsFile <- "./Rdata/Kidney_scMutiOmic_2Sample.rds"
+obj <- readRDS(rdsFile)
+
+
+##Supplementary Fig. 2
+markers <- c("PTPRC","PECAM1","CD34","COL3A1","COL1A2","EPCAM","KRT8","KRT18")
+DefaultAssay(obj) <- "RNA"
+FeaturePlot(obj,features = markers,
+                   reduction = "umap",pt.size = 0.1,
+                   max.cutoff = 'q95',ncol = 4) 
+DefaultAssay(obj) <- "peaks"
+Idents(obj)<- "CellType"
+library(Signac)
+library(ggplot2)
+Coverageplt <- list()
+for(gene in markers){
+	#(1) Plotting aggregated signal
+	cov_plot <- CoveragePlot(
+	  object = obj,
+	  region = gene,
+	  annotation = TRUE,
+	  peaks = F,
+	  links = F
+	)+scale_fill_manual(values=color_celltype)
+	
+	ggsave(paste0(plotdir,"/",ID,"_Coverageplt_",gene,".pdf"),cov_plot,width =5,height = 5)
+
+}
+
+
+
+#Fig.2a
+group_by <- c("sampleName","CellType") 
+pd <- DimPlot.multi(obj,group_by = group_by,color_list=color_list,legend_position = "right")
+ggsave(paste0(plotdir,"/DimPlot_",group_by[1],".pdf"),pd,width =10,height = 5)
+#Fig.2f,g
 CNVresFile_sc <- paste0("./AnalysisData/final.CNVres_",ID,".rds")
 outres <- readRDS(CNVresFile_sc)
 ##
@@ -203,8 +261,11 @@ cnv_plots_comb(ID,outres,plotdir=plotdir)
 ID = "ccRCC4"
 CNVresFile_sc <- paste0("./AnalysisData/final.CNVres_",ID,".rds")
 outres <- readRDS(CNVresFile_sc)
+#Fig.2h,i
 cnv_plots_comb(ID,outres,plotdir=plotdir)
 
+
+#Fig.5
 ##BRCA
 ID = "BRCA"
 CNVresFile_sc <- paste0("./AnalysisData/final.CNVres_",ID,".rds")
@@ -235,5 +296,212 @@ ID = "OV"
 CNVresFile_sc <- paste0("./AnalysisData/final.CNVres_",ID,".rds")
 outres <- readRDS(CNVresFile_sc)
 cnv_plots_comb(ID,outres,plotdir=plotdir)
+
+
+
+
+library(GenomicRanges)
+library(Signac)
+library(TeaCNV)
+library(gridExtra)
+
+outdir0 <- "./GSE240822"
+if(!file.exists(outdir0)){dir.create(outdir0,recursive=T)}
+IDs <- c("BRCA","PDAC","HNSCC","CESC","OV")
+SampleInfo <- data.frame(cancer=c("BRCA","PDAC","HNSCC","CRC","OV"),
+            sample=c("HT243B1-S1H4","PM581P1-T1","P5590-N1","HT250C1-Th1K1","VF027V1-S2"))
+
+for(i in 1:5){
+  ID <- SampleInfo[i,1]
+  outdir <- paste0(outdir0,"/",ID);if(!file.exists(outdir)){dir.create(outdir,recursive=T)}
+  sampleID <- SampleInfo[i,2]
+  print(ID)
+  print(sampleID)
+  outdir_clt <- paste0(outdir,"/atac2cnv/",sampleID)
+
+  datadir <- paste0("./GSE240822/",ID)
+  inputdata <- paste0(datadir,"/",ID,"_AllCell_Final_SuerObj.RDS")
+  obj <- readRDS(inputdata)
+
+  CNVres <- readRDS(paste0(outdir_clt,"/final.CNVres.rds"))
+  cellinfo <- CNVres$cellinfo
+  cellinfo <- cellinfo[!is.na(cellinfo$clone),]
+  dim(cellinfo)
+  color_r <- cols_Palette[1:length(unique(cellinfo$clone))]
+  names(color_r) <- sort(unique(cellinfo$clone))
+
+  obj_sub <- obj[,rownames(cellinfo)]
+  obj_sub<- AddMetaData(obj_sub,cellinfo)
+  Idents(obj_sub)<- obj_sub$clone
+
+  #UMAP RNA
+  DefaultAssay(obj_sub) <- "RNA"
+  obj_sub <- SCTransform(obj_sub, verbose = FALSE) %>% FindVariableFeatures(nfeatures = 3000)
+  VariableGenes = VariableFeatures(object = obj_sub)
+  removeG <- VariableGenes[grep("^IG|^TR|^AC|^AL|^HIST|^LIN|^MT|^RPS",VariableGenes)]
+  VariableGenes  <- VariableGenes[!VariableGenes%in%removeG]
+  obj_sub@assays$SCT@var.features = VariableGenes
+  obj_sub <- obj_sub%>% RunPCA(features = VariableGenes,verbose = FALSE) %>% 
+    RunUMAP(dims = 1:30, reduction.name = 'umap.rna', reduction.key = 'rnaUMAP_')
+  p_rna <- DimPlot(obj_sub, reduction = "umap.rna", group.by = "clone",pt.size =1.2,label.size = 5,label = F,repel = T,cols=color_r)+ ggtitle("RNA")#&NoLegend()
+
+
+  #UMAP ATAC
+  DefaultAssay(obj_sub) <- "peaks"
+  obj_sub <- RunTFIDF(obj_sub)
+  obj_sub <- FindTopFeatures(obj_sub, min.cutoff = 'q5')
+  obj_sub <- RunSVD(obj_sub)
+  obj_sub <- RunUMAP(object = obj_sub, reduction = 'lsi', dims = 2:30,reduction.name = "umap.atac", reduction.key = "atacUMAP_")
+  p_atac <- DimPlot(obj_sub, reduction = "umap.atac", group.by = "clone",pt.size =1.2,label.size = 5,label = F,repel = T,cols=color_r)+ ggtitle("ATAC")#&NoLegend()
+  #ggsave(paste0(outdir_clt,"/umapATAC_Epi_clone.pdf"),p_atac,height=4.5,width =4.5)
+
+  umap_coords_rna <- Embeddings(obj_sub, "umap.rna")
+  umap_coords_atac <- Embeddings(obj_sub, "umap.atac")
+  obj_sub@meta.data <- cbind(obj_sub@meta.data, umap_coords_rna,umap_coords_atac)
+
+  mat_r <- CNVres$cellbinRatio_raw
+  mat_r <- mat_r[,rownames(cellinfo)]
+
+  if(ID=="PDAC" & sampleID=="PM581P1-T1"){
+    mat_r <- mat_r[grepl("chr18|chr19",rownames(mat_r)),]
+    CNV_segs <- data.frame(Region=c("chr18_21599651_80247759","chr19_29212136_40571061"))#from "CNVvalue_ano"
+
+  }
+  if(ID=="BRCA" & sampleID=="HT243B1-S1H4"){
+    mat_r <- mat_r[grepl("chr1|chr10|chr11|chr16|chr20",rownames(mat_r)),]
+
+    CNV_segs <- data.frame(Region=c("chr11_108663863_134332689","chr20_49045582_56468036"))#from "CNVvalue_ano"
+
+  }
+  if(ID=="HNSCC" & sampleID=="P5590-N1"){
+    # mat_r <- mat_r[grepl("chr3|chr4|chr5|chr13|chr22",rownames(mat_r)),]
+    CNV_segs <- data.frame(Region=c("chr3_143970877_198081878","chr5_52799370_135142136","chr13_19633124_114314884"))#from "CNVvalue_ano"
+
+  }
+
+  if(ID=="CRC" & sampleID=="HT250C1-Th1K1"){
+    mat_r <- mat_r[grepl("chr2",rownames(mat_r)),]
+
+    CNV_segs <- data.frame(Region=c("chr2_44660_242089223"))#from "CNVvalue_ano"
+
+  }
+
+  if(ID=="OV" & sampleID=="VF027V1-S2"){
+    # mat_r <- mat_r[grepl("chr1|chr7|chr19",rownames(mat_r)),]
+    # CNV_segs <- data.frame(Region=c("chr1_36322681_54801704","chr19_29211648_39032790"))#from "CNVvalue_ano"
+    # CNV_segs <- data.frame(Region=c("chr1_999532_121185055","chr7_148953_56106829","chr8_730578_43141640","chr19_39236582_47484450"))#from "CNVvalue_ano"
+    CNV_segs <- data.frame(Region=c("chr1_999532_121185055","chr1_165598925_165630123","chr5_160008300_181160654","chr7_148953_56106829","chr8_730578_43141640","chr19_39236582_47484450"))#from "CNVvalue_ano"
+
+  }
+
+  new_assay <- CreateChromatinAssay(
+    counts  = mat_r,
+    sep = c("-", "-"),
+    genome = "GRCh38",
+    min.cells = 1
+  )
+  new_obj <- CreateSeuratObject(counts = new_assay, assay = "subPeaks")
+  new_obj <- FindTopFeatures(new_obj, min.cutoff = 'q5')
+  new_obj <- ScaleData(new_obj,features = rownames(new_obj) )
+  Ncells <- ncol(new_obj)
+  if(Ncells<50 & Ncells>1){
+    npcs.pca=floor(Ncells/2)
+    dims.max=min(npcs.pca,15)
+    n.neighbors = min(30,Ncells)
+  }else{npcs.pca=50;dims.max=15;n.neighbors=30}
+  new_obj <- RunPCA(new_obj, features = VariableFeatures(object = new_obj),npcs=npcs.pca)
+  new_obj <- RunUMAP(new_obj, reduction = 'pca',dims = 1:dims.max,n.neighbors=n.neighbors)
+  new_obj<- AddMetaData(new_obj,cellinfo)
+
+  pd <- DimPlot(new_obj, reduction = "umap", group.by = "clone",pt.size =1.2,label.size = 5,label = F,repel = T,cols=color_r)+ ggtitle("CNV")#&NoLegend()
+  pd+p_atac+p_rna
+  ggsave(paste0(outdir_clt,"/umap_Epi_clone.pdf"),pd+p_atac+p_rna,height=4.5,width =13.5)
+
+  markers <- c("EPCAM","KRT19","KRT18","KRT8")
+  DefaultAssay(obj_sub) <- "RNA"
+  existing_genes <- markers[markers %in% rownames(obj_sub)]
+  exp_mt<- GetAssayData(obj_sub, assay = "RNA", slot = "data")
+  avg_exp <- colMeans(exp_mt[existing_genes, ])
+  obj_sub$TumorMarkers_avg <- avg_exp
+
+  new_obj<- AddMetaData(new_obj,obj_sub@meta.data[,"TumorMarkers_avg",drop=F])
+  pm <- FeaturePlot(object = new_obj, features = "TumorMarkers_avg",ncol=1,pt.size =1.2,
+     min.cutoff = "q10", max.cutoff = "q90")& scale_colour_gradientn(colours = c("#F1F2F2","yellow","red")) 
+  pm <- lapply(pm, function(x) x  +
+    theme(
+      axis.ticks = element_blank(),
+      axis.text = element_blank(),
+      axis.title = element_blank(),
+      panel.border = element_rect(colour = "black", fill = NA, linewidth = 1),
+      axis.line = element_blank(),legend.position = "bottom"
+    )) 
+
+  umap_coords <- Embeddings(new_obj, "umap")
+  colnames(umap_coords) <- c("cnvUMAP_1","cnvUMAP_2")
+  obj_sub<- AddMetaData(obj_sub,umap_coords)
+
+  #计算CNV区间的ATAC nCount
+  DefaultAssay(obj_sub) <- "peaks"
+  counts_mat <- GetAssayData(obj_sub[["peaks"]], slot = "counts")
+  peak.gr <- StringToGRanges(rownames(obj_sub))
+
+
+
+  CNV_segs <- CNV_segs %>%
+  tidyr::separate(
+    col = Region,
+    into = c("chr", "start", "end"),
+    sep = ":|-|_",   
+    remove = FALSE
+  ) %>%
+  dplyr::mutate(
+    start = as.numeric(start),
+    end = as.numeric(end)
+  ) %>%
+  dplyr::select(chr, start, end, everything())
+
+  tb_nCount <- c()
+  for(s in 1:nrow(CNV_segs) ){
+    CNV_segs_gr <- GRanges(
+      seqnames = CNV_segs$chr[s],
+      ranges = IRanges(start = CNV_segs$start[s], end = CNV_segs$end[s]),
+      CNV = CNV_segs$Region[s]
+    )
+    overlapping_peaks <- subsetByOverlaps(peak.gr, CNV_segs_gr)
+    peaks_key <- as.character(overlapping_peaks)
+    peaks_key <- gsub(":","-",peaks_key)
+    counts_mat_seg <- counts_mat[peaks_key,,drop=F]
+    counts_mat_seg <- as.matrix(counts_mat_seg)
+    nCount_seg <- colSums(counts_mat_seg)
+
+    tb_nCount <- rbind(tb_nCount,nCount_seg)
+  }
+  tb_nCount <- as.data.frame(t(tb_nCount))
+  colnames(tb_nCount) <-CNV_segs$Region
+
+  saveRDS(obj_sub,paste0(outdir_clt,"/SeuratObj_final_clone.rds"))
+  new_obj<- AddMetaData(new_obj,tb_nCount)
+  saveRDS(new_obj,paste0(outdir_clt,"/SeuratObj_CNVumap.rds"))
+
+  pp <- FeaturePlot(object = new_obj, features = CNV_segs$Region,ncol=4,pt.size =1.2,
+     min.cutoff = "q5", max.cutoff = "q95")& scale_colour_gradientn(colours = c("#F1F2F2","yellow","red")) 
+  plot.list <- lapply(pp, function(x) x  +
+    theme(
+      axis.ticks = element_blank(),
+      axis.text = element_blank(),
+      axis.title = element_blank(),
+      panel.border = element_rect(colour = "black", fill = NA, linewidth = 1),
+      axis.line = element_blank(),legend.position = "bottom"
+    ))
+
+  ncol <- ifelse(length(plot.list)>4,4,length(plot.list))
+  combined_plot <- grid.arrange(
+    grobs = c(pm,plot.list),
+    ncol = ncol+1
+  )
+  width <- ifelse(length(plot.list)>4,16,4*(length(plot.list)+1))
+  height <- ifelse(length(plot.list)>4,4.5*(ceiling(length(plot.list)/4)),4.5)
+  ggsave(paste0(outdir_clt, "/umapcnv_CNVregion_atac.pdf"), combined_plot, height =height, width = width)
+}
 
 

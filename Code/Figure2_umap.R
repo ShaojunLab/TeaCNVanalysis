@@ -1,4 +1,4 @@
-##Fig.2ab UMAP
+##Fig.2, 5 UMAP (RNA,ATAC,CNV)
 
 
 library(GenomicRanges)
@@ -8,6 +8,7 @@ library(gridExtra)
 cols_Palette <- c("#CCCCCC","#A6DAEF","#D9BDD8","#E58579","#8AB1D2","#F9E9A4","#F1AEA7","#9D9ECD","#C9C780")
 work_dir <- '~/Library/Mobile Documents/com~apple~CloudDocs/TeaCNVmanuscript/Code_Rdata_upload/'
 setwd(work_dir)
+
 source("./Code/Function/funs_dataProcess.R")
 source("./Code/Function/atac_visualizeFun.R")
 source("./Code/Function/colorPalette.R")
@@ -15,22 +16,20 @@ source("./Code/Function/fun_Grange.R")
 outdir <- work_dir
 
 
-
-
-for(ID in c("ccRCC2","ccRCC3","ccRCC4")){
+for(ID in c("ccRCC1"，"ccRCC2","ccRCC3","ccRCC4")){
 	if(ID %in% c("ccRCC3","ccRCC4")){
 		rdsFile <- "./Rdata/Kidney_scMutiOmic_2Sample.rds"
 		obj <- readRDS(rdsFile)
-	}else if(ID %in% c("ccRCC2")){
+	}else if(ID %in% c("ccRCC1"，"ccRCC2")){
 		rdsFile <- "./Rdata/Kidney_scATAC_2Sample.rds"
 		obj <- readRDS(rdsFile)
+
 	}
 
-
-	#ID = "ccRCC3"
 	outdir_clt <- paste0(outdir,'/',ID)
 	CNVresFile_sc <- paste0("./AnalysisData/final.CNVres_",ID,".rds")
 	CNVres <- readRDS(CNVresFile_sc)
+	
 	cellinfo <- CNVres$cellinfo
 	cellinfo <- cellinfo[!is.na(cellinfo$clone),]
 	color_r <- cols_Palette[1:length(unique(cellinfo$clone))]

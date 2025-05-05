@@ -1,5 +1,5 @@
 # This program will access the teaCNV's performance by compairing the output of different methods.
-
+##Figure 3,4
 options(expressions=10000)
 suppressMessages({
     library(ggplot2)
@@ -274,7 +274,7 @@ for (i in 1:length(sampleID)){
 
 
 ### combine cnv-ratio for each method
-###Fig.3 a,e,f histogram
+###Fig.3 histogram
 #select the DNA CNV regions
 suppressPackageStartupMessages({
     library(ggpubr)
@@ -400,7 +400,7 @@ for(sam in sampleID){
 
 
 
-###Fig. 3a,e,f Segmentation plots
+###Fig. 3 Segmentation plots
 setwd(work_dir)
 for(sam in sampleID){
     outdir_clt <- paste0(work_dir,'/',sam)
@@ -459,41 +459,10 @@ for(sam in sampleID){
     }
     ggsave(paste0(work_dir,"/segPlot_TeaCNV_",sam,".pdf"),p1,height = 2,width=10)
 
-    ##Fig.3b middle three panels
+    ##Extended Fig. 6
     TeaCNV::plot_combine_seg(outres$clonalest,ylim=NULL,
         outplot_name=paste0("clonalCNV_final_",sam,".pdf"),show_dots=FALSE,
         outdir=outdir_clt)
-    ##Fig.3b bottom panel
-    cols_Palette <- c("#CCCCCC","#A6DAEF","#D9BDD8","#E58579","#8AB1D2","#F9E9A4","#F1AEA7","#9D9ECD","#C9C780")
-    CNmt <- do.call(cbind,lapply(sort(names(outres$clonalest)),function(cluster){
-      clonal_res <- outres$clonalest[[cluster]]$input_BinSegRatio
-      integerCNV <- outres$clonalest[[cluster]]$seg.dat
-      integerCNV <- integerCNV[,c("segName","relativeCN","integerCN")]
-      clonal_res <- clonal_res[,!grepl("relativeCN|integerCN",colnames(clonal_res))]
-      clonal_res <- left_join(clonal_res,integerCNV,by="segName")
-      rownames(clonal_res) <- clonal_res$binID
-      return(clonal_res$integerCN)
-      }))
-    rownames(CNmt) <- rownames(outres$clonalest[[1]]$input_BinSegRatio)
-    colnames(CNmt) <- sort(names(outres$clonalest))
-    clone_info <- data.frame(row.names=colnames(CNmt),clone=colnames(CNmt))
-    color_r <- cols_Palette[1:length(unique(clone_info$clone))]
-    names(color_r) <- sort(unique(clone_info$clone))
-    left_anno_cols <- list()
-    left_anno_cols[["clone"]] <- color_r
-    height <- ifelse(ncol(CNmt)>2,0.35*(ncol(CNmt))+0.5,ifelse(ncol(CNmt)==1,1.2,1.5))
-    p_cloneCN <- heatmap4peakMt(mat=CNmt,
-                        meta_info=clone_info,
-                        sep_by="-",
-                        outdir= outdir_clt,
-                        value.type="CNV",
-                        clust_rows=F,
-                        show_legend_row = T,
-                        legend_titles="integer CN",
-                        fileout_name=paste0("heatmap_TeaCNV_",sam),
-                        col_list=left_anno_cols,
-                        column.title = NULL,
-                        width=10,height=height,device="pdf")
 
 
     ###epiAneufinder
