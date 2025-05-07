@@ -459,7 +459,7 @@ for(sam in sampleID){
     }
     ggsave(paste0(work_dir,"/segPlot_TeaCNV_",sam,".pdf"),p1,height = 2,width=10)
 
-    ##Extended Fig. 6
+    ##Supplementary Fig. 6
     TeaCNV::plot_combine_seg(outres$clonalest,ylim=NULL,
         outplot_name=paste0("clonalCNV_final_",sam,".pdf"),show_dots=FALSE,
         outdir=outdir_clt)
