@@ -1,0 +1,21 @@
+name: simfragenv
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - python=3.9
+  - r-base=4.2.3
+  - r-matrix
+  - pandas
+  - numpy
+  - tqdm
+  - pysam
+  - rpy2
+
+
+# conda create -n simfragenv python=3.9 r-base=4.2.3 -y
+# conda activate simfragenv
+
+# # Step 2: 
+# conda install r-matrix pandas numpy tqdm pysam -y
+# conda install -c conda-forge rpy2 -y
